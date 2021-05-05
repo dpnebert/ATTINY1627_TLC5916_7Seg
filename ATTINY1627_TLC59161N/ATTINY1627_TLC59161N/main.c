@@ -144,10 +144,3 @@ void load(char p) {
 	latch();
 	enableOutput();
 }
-
-ISR(TCA0_OVF_vect)
-{
-	int flags = TCA0.SINGLE.INTFLAGS;
-	//ones++;
-	TCA0.SINGLE.INTFLAGS = flags;
-}
