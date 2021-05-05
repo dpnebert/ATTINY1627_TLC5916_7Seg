@@ -3,8 +3,6 @@
 
 #define REFRESH_RATE_DELAY	1500
 
-char count;
-void i2c_send(char p);
 void send(char p);
 void latch();
 void enableOutput();
@@ -22,9 +20,7 @@ char characters[] = { 0b11111100,
 	0b11111110,
 0b11100110 };
 
-uint32_t azc;
 uint32_t temp;
-
 
 int ones, tens, hundreds, thousands;
 char c_ones, c_tens, c_hundreds, c_thousands;
@@ -34,12 +30,10 @@ int main(void)
 {
 	/* Initializes MCU, drivers and middleware */
 	atmel_start_init();
-	azc = 0;
-	temp = 1173;
-	reading = 0;
-	ADC_0_enable();
 	
-	count = 0;
+	temp = 1173;
+	
+	ADC_0_enable();
 	
 	ones = 0;
 	tens = 0;
@@ -53,13 +47,10 @@ int main(void)
 	
 	L1_set_level(true);
 
-	/* Replace with your application code */
 	while (1) {
 		
 		reading = (ADC_0_get_conversion(2) + reading) / 2;
 		uint32_t temp = (0.9508 * reading) - 41.2131;
-		USART0.TXDATAL = temp;
-		//temp = 1128;
 		
 		ones = temp % 10;
 		temp = temp - ones;
@@ -72,10 +63,7 @@ int main(void)
 		temp = temp - hundreds;
 		hundreds /= 100;
 		
-		thousands = temp / 1000;
-		
-		
-		
+		thousands = temp / 1000;		
 		
 		
 		load(characters[ones]);
@@ -97,23 +85,9 @@ int main(void)
 		L1_set_level(true);
 		_delay_us(REFRESH_RATE_DELAY);
 		L1_set_level(false);
-		count = 0b10011011;
-		i2c_send(count);
-		//count++;
-		_delay_us(1000);
 		
-		
-		
+		_delay_us(1000);		
 	}
-}
-
-void i2c_send(char p) {
-	I2C_0_open(p);
-	//I2C_0_set_buffer(values, 1);
-	//I2C_0_set_address_nack_callback(i2c_cb_restart_write, NULL); // NACK polling?
-	I2C_0_master_write();
-	I2C_0_close();
-	SDI_set_level(false);
 }
 
 void send(char p) {
@@ -126,8 +100,6 @@ void send(char p) {
 	}
 	SDI_set_level(false);
 }
-
-
 void latch() {
 	LE_set_level(true);
 	LE_set_level(false);
